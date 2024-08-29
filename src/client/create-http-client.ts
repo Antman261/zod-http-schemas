@@ -51,7 +51,12 @@ export function createHttpClient<S extends HttpSchema>(
     // this will ensure we have correct types in the Frontend (e.g.: Date instance, not a string of date)
     const responseBodySchema = schema[`${method} ${path}`].responseBody;
 
-    return axiosClient({ method, url, data: info?.body }).then((response) => {
+    return axiosClient({
+      method,
+      url,
+      data: info?.body,
+      params: info?.queryParams
+    }).then((response) => {
       // if we fail to parse here, mean our API is returning something weird
       // an Exception would be thrown by Zod
       response.data = responseBodySchema.parse(response.data);
