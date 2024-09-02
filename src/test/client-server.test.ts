@@ -79,8 +79,6 @@ describe('Implementing a HTTP client and server', () => {
     await expect(res).eq(6);
   });
   it('Type transformations work as expected for response bodies', async () => {
-    // A number transformed into a string will fail validation at the client until
-    // the type specifies .pipe(z.string()).
     await expect(client.post('/sum/transform-response', {
       body: [1, 2, 3]
     })).to.be.rejectedWith(JSON.stringify([
