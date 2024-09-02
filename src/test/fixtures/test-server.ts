@@ -115,6 +115,11 @@ export function createTestServer() {
     const result = numbers.reduce((acc, val) => acc + val, 0);
     res.send(result);
   });
+  typedRoutes.post('/sum/with-query-param', async (req, res) => {
+    const numbers = req.body;
+    const result = numbers.reduce((acc, val) => acc + val, 0) + parseInt(req.query.alsoAdd as string);
+    res.send(result);
+  });
 
   // Create an Express Application and add middleware to it, including our HTTP schema implementation.
   const app = express();

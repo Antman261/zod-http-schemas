@@ -84,6 +84,15 @@ describe('Implementing a HTTP client and server', () => {
     });
     await expect(res).eq('6');
   });
+  it('Passes query params on to the server', async () => {
+    const { data: res } = await client.post('/sum/with-query-param', {
+      body: [1, 2, 3],
+      queryParams: {
+        alsoAdd: 4
+      }
+    });
+    await expect(res).eq(10);
+  });
 });
 
 describe('HTTP Server without JSON parser', () => {

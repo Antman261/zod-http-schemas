@@ -46,6 +46,12 @@ export const testSchema = createHttpSchema({
       .int()
       .transform((s) => s.toString()),
   },
+  'POST /sum/with-query-param': {
+    requestBody: z.array(z.number().int()),
+    responseBody: z
+      .number()
+      .int(),
+  },
 });
 
 // Used for testing get request without json body parser
