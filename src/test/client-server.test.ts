@@ -74,7 +74,7 @@ describe('Implementing a HTTP client and server', () => {
   });
   it('Type transformations work as expected for request bodies', async () => {
     const { data: res } = await client.post('/sum/transform-string', {
-      body: ['1', '2', '3']
+      body: ['1', '2', '3'],
     });
     await expect(res).eq(6);
   });
