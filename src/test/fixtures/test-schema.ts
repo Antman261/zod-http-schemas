@@ -2,13 +2,18 @@ import { createHttpSchema, z } from '../../shared';
 import { errorUtil } from 'zod/lib/helpers/errorUtil';
 import toString = errorUtil.toString;
 
+const customValidationErrorResponse = z.object({
+  success: z.literal(false),
+  code: z.literal('MY_CUSTOM_VALIDATION_ERROR'),
+});
+
 export const testSchema = createHttpSchema({
   'GET /random-numbers': {
     responseBody: z.array(z.number()),
   },
   'POST /sum': {
     requestBody: z.array(z.number()),
-    responseBody: z.number(),
+    responseBody:  z.number().or(customValidationErrorResponse),
   },
   'POST /product': {
     requestBody: z.array(z.number()),
@@ -29,7 +34,7 @@ export const testSchema = createHttpSchema({
   },
   'POST /sum/negative': {
     requestBody: z.array(z.number().int().negative()),
-    responseBody: z.number().negative().int(),
+    responseBody: z.number().negative().int().or(customValidationErrorResponse),
   },
   'POST /sum/negative-broken': {
     requestBody: z.array(z.number().int().negative()),
