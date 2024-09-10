@@ -79,10 +79,17 @@ describe('Implementing a HTTP client and server', () => {
     await expect(res).eq(6);
   });
   it('Type transformations work as expected for response bodies', async () => {
-    const { data: res } = await client.post('/sum/transform-response', {
-      body: [1, 2, 3],
-    });
-    await expect(res).eq('6');
+    await expect(client.post('/sum/transform-response', {
+      body: [1, 2, 3]
+    })).to.be.rejectedWith(JSON.stringify([
+      {
+        code: 'invalid_type',
+        expected: 'number',
+        received: 'string',
+        path: [],
+        message: 'Expected number, received string'
+      }
+    ], null, 2));
   });
 });
 
