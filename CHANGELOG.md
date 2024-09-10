@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.5](https://github.com/antman261/zod-http-schemas/compare/v2.0.1...v2.0.5) (2024-09-10)
+
+
+### Bug Fixes
+
+* fixed wrong zod version in lock file ([#11](https://github.com/antman261/zod-http-schemas/issues/11)) ([ef72473](https://github.com/antman261/zod-http-schemas/commit/ef7247312e673cd78323ff54822619968e1fb7b2))
+* Get `client-server.test.ts` passing ([#13](https://github.com/antman261/zod-http-schemas/issues/13)) ([f129134](https://github.com/antman261/zod-http-schemas/commit/f129134058341d10073d8ffae0cbf123437b6819))
+* Pass queryParams to the axios client ([#12](https://github.com/antman261/zod-http-schemas/issues/12)) ([b1bd355](https://github.com/antman261/zod-http-schemas/commit/b1bd3554ef5fa5ddea2623b6c22f1b4a1fe896c9)), closes [#13](https://github.com/antman261/zod-http-schemas/issues/13)
+
 ### [2.0.3](https://github.com/Skutopia-org/zod-http-schemas/compare/v2.0.2...v2.0.3) (2023-09-12)
 Bump back `zod` package version to old version.
 

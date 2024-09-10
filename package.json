@@ -1,6 +1,6 @@
 {
     "name": "zod-http-schemas",
-    "version": "2.0.4",
+    "version": "2.0.5",
     "description": "Zod Powered, strongly-typed HTTP schemas",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
