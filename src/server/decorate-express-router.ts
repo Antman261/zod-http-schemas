@@ -155,7 +155,12 @@ function createBodyValidationMiddleware(
     onValidationError ??
     ((err, _, res) => {
       res.status(400).json(err);
-      console.error(err);
+    });
+  
+  onResponseValidationError = 
+    onResponseValidationError ??
+    ((err, _, res) => {
+      res.status(500).json(err);
     });
 
   return (req, res, next) => {
@@ -202,31 +207,39 @@ function createBodyValidationMiddleware(
     const { json, jsonp, send } = res; // the original json/jsonp/send methods to be wrapped
     res = Object.assign(res, {
       json: (body: unknown) => {
+        console.log("HERE")
         try {
-          json.call(body, routeInfo.responseBody);
+          json.call(res, validateAndClean(body, routeInfo.responseBody));
         } catch (err) {
-          if (onResponseValidationError) {
+          if (onResponseValidationError && !res.locals.errorHandled) {
+            res.locals.errorHandled = true;
             onResponseValidationError(err, req, res, next);
-            return;
           }
-          throw err;
+          if(!res.locals.errorHandled){
+            throw err;
+          }
         }
       },
       jsonp: (body: unknown) => {
         try {
-          json.call(body, routeInfo.responseBody);
+          jsonp.call(res, validateAndClean(body, routeInfo.responseBody));
         } catch (err) {
-          if (onResponseValidationError) {
+          if (onResponseValidationError && !res.locals.errorHandled) {
+            res.locals.errorHandled = true;
             onResponseValidationError(err, req, res, next);
+            return;
+          }
+          if(res.locals.errorHandled){
             return;
           }
           throw err;
         }
       },
-      send: (body: unknown) =>
-        typeof body === 'string' ? send.call(res, body) : res.json(body),
+      send: (body: unknown) => {
+        return typeof body === 'string' ? send.call(res, body) : res.json(body)
+      },
     });
-
+    
     // Param/body checking is done. Pass on to subsequent middleware for further processing.
     next();
   };
@@ -234,9 +247,6 @@ function createBodyValidationMiddleware(
   // Helper function to runtime-validate that the body is the expected type, and to remove excess properties.
   function validateAndClean(value: unknown, type: ZodTypeAny = z.undefined()) {
     return type.parse(value);
-  }
-  function safeValidateAndClient(value: unknown, type: ZodTypeAny = z.undefined()) {
-    return type.safeParse(value);
   }
 }
 

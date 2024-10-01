@@ -33,6 +33,7 @@ export function createTestServer() {
     },
     onResponseValidationError: (err, _, res) => {
       console.log(err);
+      console.log("FIRED")
       res.status(500).send({success:false, code: 'FAILED_TO_PARSE_RESPONSE'});
     }
   });
@@ -46,12 +47,6 @@ export function createTestServer() {
   typedRoutes.post('/sum', (req, res) => {
     let result = req.body.reduce((sum, n) => sum + n, 0);
     res.send(result);
-  });
-
-  typedRoutes.get('/sum/bad-response', (req, res) => {
-    const badResponse = 'not-a-number';
-    // @ts-ignore
-    res.send(badResponse);
   });
 
   typedRoutes.get('/404', (req, res) => {
@@ -171,6 +166,12 @@ export const createGetOnlyServer = () => {
   // Specify some route handlers inline
   typedRoutes.get('/random-numbers', [log], (req, res) => {
     res.send([Math.random(), Math.random(), Math.random()]);
+  });
+
+  typedRoutes.get('/bad-response', (req, res) => {
+    const badResponse = { invalidObject : "bar" };
+    // @ts-ignore
+    res.status(200).json(badResponse);    
   });
 
   // Create an Express Application and add middleware to it, including our HTTP schema implementation.

@@ -57,9 +57,6 @@ export const testSchema = createHttpSchema({
       .number()
       .int(),
   },
-  'GET /sum/bad-response': {
-    responseBody: z.number().int()
-  }
 });
 
 // Used for testing get request without json body parser
@@ -67,4 +64,7 @@ export const testGetOnlySchema = createHttpSchema({
   'GET /random-numbers': {
     responseBody: z.array(z.number()),
   },
+  'GET /bad-response': {
+    responseBody: z.object({foo: z.string()})
+  }
 });
