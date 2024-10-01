@@ -31,6 +31,10 @@ export function createTestServer() {
         .status(200)
         .send({ success: false, code: 'MY_CUSTOM_VALIDATION_ERROR' });
     },
+    onResponseValidationError: (err, _, res) => {
+      console.log(err);
+      res.status(500).send({success:false, code: 'FAILED_TO_PARSE_RESPONSE'});
+    }
   });
 
   // Specify some route handlers inline
@@ -42,6 +46,12 @@ export function createTestServer() {
   typedRoutes.post('/sum', (req, res) => {
     let result = req.body.reduce((sum, n) => sum + n, 0);
     res.send(result);
+  });
+
+  typedRoutes.get('/sum/bad-response', (req, res) => {
+    const badResponse = 'not-a-number';
+    // @ts-ignore
+    res.send(badResponse);
   });
 
   typedRoutes.get('/404', (req, res) => {

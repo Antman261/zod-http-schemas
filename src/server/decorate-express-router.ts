@@ -32,6 +32,11 @@ export interface DecorateExpressRouterOptions<
    * specified, the default behaviour is to respond with a 400 status code.
    */
   onValidationError?: ErrorRequestHandler;
+  /**
+   * Optional response handler to delegate to if a server-side validation error occurs. If this option is not
+   * specified, the default behaviour is to respond with an Internal Server Error
+   */
+  onResponseValidationError?: ErrorRequestHandler;
 }
 
 /**
@@ -102,7 +107,8 @@ export function decorateExpressRouter<
     );
     const validateBodies = createBodyValidationMiddleware(
       routeInfo,
-      options.onValidationError
+      options.onValidationError,
+      options.onResponseValidationError
     );
     router[m](
       path,
@@ -142,7 +148,8 @@ function createRequestPropValidationMiddleware(
 /** Creates a middleware function that validates request params/body and response body for the given `routeInfo`. */
 function createBodyValidationMiddleware(
   routeInfo: HttpSchema[any],
-  onValidationError?: ErrorRequestHandler
+  onValidationError?: ErrorRequestHandler,
+  onResponseValidationError?: ErrorRequestHandler,
 ): ExpressRequestHandler {
   onValidationError =
     onValidationError ??
@@ -194,10 +201,28 @@ function createBodyValidationMiddleware(
     // be passed to `next` and hence any error handling middleware (by default will respond with a 500 error).
     const { json, jsonp, send } = res; // the original json/jsonp/send methods to be wrapped
     res = Object.assign(res, {
-      json: (body: unknown) =>
-        json.call(res, validateAndClean(body, routeInfo.responseBody)),
-      jsonp: (body: unknown) =>
-        jsonp.call(res, validateAndClean(body, routeInfo.responseBody)),
+      json: (body: unknown) => {
+        try {
+          json.call(body, routeInfo.responseBody);
+        } catch (err) {
+          if (onResponseValidationError) {
+            onResponseValidationError(err, req, res, next);
+            return;
+          }
+          throw err;
+        }
+      },
+      jsonp: (body: unknown) => {
+        try {
+          json.call(body, routeInfo.responseBody);
+        } catch (err) {
+          if (onResponseValidationError) {
+            onResponseValidationError(err, req, res, next);
+            return;
+          }
+          throw err;
+        }
+      },
       send: (body: unknown) =>
         typeof body === 'string' ? send.call(res, body) : res.json(body),
     });
@@ -209,6 +234,9 @@ function createBodyValidationMiddleware(
   // Helper function to runtime-validate that the body is the expected type, and to remove excess properties.
   function validateAndClean(value: unknown, type: ZodTypeAny = z.undefined()) {
     return type.parse(value);
+  }
+  function safeValidateAndClient(value: unknown, type: ZodTypeAny = z.undefined()) {
+    return type.safeParse(value);
   }
 }
 

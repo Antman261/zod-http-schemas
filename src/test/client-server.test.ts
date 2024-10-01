@@ -59,6 +59,13 @@ describe('Implementing a HTTP client and server', () => {
       code: 'MY_CUSTOM_VALIDATION_ERROR',
     });
   });
+  it('Server-side response validation error', async () => {
+    const { data: invalid } = await client.get('/sum/bad-response');
+    expect(invalid).to.include({
+      success: false,
+      code: 'FAILED_TO_PARSE_RESPONSE',
+    });
+  });
   it('Type refinement produces server-side validation error', async () => {
     const { data: invalid } = await client.post('/sum/negative', {
       body: [-1, 2, -3],
